@@ -1,0 +1,260 @@
+let crowd_array_1 = [];
+let crowd_size_1 = 15;
+let rows1 = [[0,50],[50,100],[100,150],[150,200]];
+let crowd_array_2 = []; // creating an array of people
+let crowd_size_2 = 10; // how many people generated per row
+let rows2 = [
+    [0,25],[25,50],[50,75],[75,100],[100,125],[125,150],[150,175],[175,200]]; // row Y value ranges, from back to front
+let goliath_y = 500;
+let i1_time = 5000, i2_time = 9000, i3_time = 17000
+
+function setup() {
+  createCanvas(500, 500);
+
+  for (let k=0; k<rows1.length; k++){
+  let[minimum_1,maximum_1] = rows1[k]
+  for (let l=0;l<crowd_size_1;l++){
+    let y_1= random(minimum_1,maximum_1);
+    let x_1= random(width);
+    let fill_color = color(160,random(21,100),21);
+    crowd_array_1.push(new Crowd_Class(x_1,y_1,fill_color))
+  }} 
+  for (let j=0; j<rows2.length; j++){ // CROWD GEN FOR IMAGE 2
+    let [minimum_2,maximum_2] = rows2[j] // iterate thru the row Y value ranges
+    for (let i=0;i<crowd_size_2;i++){
+      let y_2= random(minimum_2,maximum_2);
+      let x_2= random(width); // random x value, random y within row limit
+      let fill_color = color(160,random(21,100),21);
+      crowd_array_2.push(new Crowd_Class(x_2,y_2,fill_color)); // make new person
+    }}}     
+
+function draw() { 
+  
+  let t = millis();
+  let step_time = t % 2000
+  
+  let step_factor = 20
+  if (t<i1_time){
+    step_factor = 20;
+  } else if (t<i2_time){
+    step_factor = 7;
+  } else {
+    step_factor = 5;
+  }
+  print(step_factor);
+  
+  push();
+  
+  if (t<i3_time){
+      if (step_time<200){
+        translate(0,step_factor);
+    }
+  
+    if (step_time <= 50 && t >i2_time){
+      goliath_y -= 20;
+    }
+  }
+  if (t<i1_time){
+    image_1();
+  } else if (t<i2_time){
+    image_2(t);
+  } else {
+    image_3(t,step_time,goliath_y);
+  }
+  pop();
+  
+  
+}
+
+function image_1(){
+  background(120,0,11);
+  fill(155,90,10);
+  ellipse(width/2,height,800,300);
+  
+  scale(1.5);
+  for(let guy1 of crowd_array_1) {
+    guy1.display(); // shows the person in crowd
+    guy1.update();
+    guy1.run1();
+  }
+  scale(0.75);
+  body();
+  slingshot(200,250);
+  hand(350,250);
+}
+
+function slingshot(x_pos,y_pos){
+  fill(57,33,5);
+  beginShape(); 
+    vertex(x_pos, y_pos-15);
+    vertex(x_pos+250, y_pos-15);
+    bezierVertex(x_pos+255,y_pos,x_pos+255,y_pos,x_pos+250,y_pos+15);
+    vertex(x_pos, y_pos+15); // slingshot handle
+    vertex(x_pos, y_pos+90);
+    bezierVertex(x_pos, y_pos+105, x_pos, y_pos+105, x_pos-15, y_pos+105);
+    vertex(x_pos-125, y_pos+105);
+    bezierVertex(x_pos-130, y_pos+90, x_pos-130, y_pos+90, x_pos-125, y_pos+75);
+  
+    vertex(x_pos-45, y_pos+75);
+    bezierVertex(x_pos-30, y_pos+75, x_pos-30, y_pos+75, x_pos-30, y_pos+60);
+  
+    vertex(x_pos-30, y_pos-60);
+    bezierVertex(x_pos-30, y_pos-75, x_pos-30, y_pos-75, x_pos-45, y_pos-75);
+  
+    vertex(x_pos-125, y_pos-75);
+    bezierVertex(x_pos-130, y_pos-90, x_pos-130, y_pos-90, x_pos-125, y_pos-105);
+    vertex(x_pos-30, y_pos-105);
+    bezierVertex(x_pos, y_pos-105, x_pos, y_pos-105, x_pos, y_pos-75);
+  
+  endShape(CLOSE);
+}
+
+function hand(x_pos,y_pos){
+  fill(50);
+  rect(x_pos-30,-30,60,y_pos);
+  ellipse(x_pos,y_pos,125,125);
+}
+
+function body(){
+  fill(75);
+  beginShape();
+    vertex(190,-30);
+    vertex(190,50);
+    vertex(150,600);
+    vertex(320,600);
+    vertex(310,100);
+    vertex(350,-30);
+  endShape();
+  //rect(150,-30,200,600);
+}
+
+function image_2(t){
+  background(113,68,11);
+  hill();
+
+  for(let guy2 of crowd_array_2) {
+    guy2.display(); // shows the person in crowd
+    guy2.update(); // updates status of person in crowd
+  }
+  david_head();// calls david's figure
+  if(t > 5000){
+    for(let guy2 of crowd_array_2) {
+      guy2.run2(); // at 5 seconds, crowd starts running
+  }}
+}
+
+function david_head(){ // david's head and shoulders
+  fill(50);
+  ellipse(width/2, height -150,200,200);
+  beginShape();
+  vertex(width/2-100,height -150);
+  vertex(width/2-65,height-20);
+  vertex(width/2-130,height);
+  vertex(width/2+130,height);
+  vertex(width/2+65,height-20);
+  vertex(width/2+100,height-150);
+  endShape(CLOSE);
+  fill(0);
+  ellipse(210,400,25,25);
+  ellipse(290,400,25,25);
+  triangle(190,375,230,380,230,390);
+  triangle(310,375,270,380,270,390);
+  fill(100);
+  ellipse(210,395,15,15);
+  ellipse(290,395,15,15);
+  
+}
+
+function hill(){
+  fill(155,90,10);
+  ellipse(width/2,height,800,400);
+}
+
+class Crowd_Class { // creating a class for the crowd
+  constructor(x,y,fill_color){ // defining all updating variables
+    this.pos = createVector(x,y);
+    this.speed = createVector(0,0);
+    this.speed_factor_1 = random(2,4);
+    this.speed_factor_2 = random(1,3); // everyone runs at a different speed
+    this.fill_color = fill_color 
+  }
+  display(){
+    fill(this.fill_color);
+    noStroke();
+    beginShape();
+    vertex(this.pos.x-10,this.pos.y);
+    vertex(this.pos.x-20,this.pos.y+60);
+    bezierVertex(this.pos.x,this.pos.y+70,this.pos.x,this.pos.y+70,this.pos.x+20,this.pos.y+60);
+    vertex(this.pos.x+20,this.pos.y+60);
+    vertex(this.pos.x+10,this.pos.y);
+    endShape();
+    ellipse(this.pos.x,this.pos.y,30); //drawing the crowd member
+  }
+  
+  run1(){
+    this.speed = p5.Vector.fromAngle(0).mult(this.speed_factor_2);
+  }
+  
+  run2(){
+    let run_angle = random(5*PI/4, 7*PI/4); //sets random angle upwards
+    this.speed = p5.Vector.fromAngle(run_angle).mult(this.speed_factor_2);
+  } // sets each individal speed with its own angle and speed factos
+  
+  update(){
+    this.pos.add(this.speed); //adds speed vector to person
+  }
+}
+
+function image_3(t,step_time,goliath_y){
+  background(120,0,11);
+  goliath(goliath_y);
+  fill(113,68,11);
+  ellipse(width/2,height,510,150); // GROUND
+  david_body(); 
+  mini_slingshot();
+}
+function david_body(){
+  fill(50);
+  //strokeWeight(3);
+  circle(width/2,height/2 + 70,20);
+  beginShape();
+  vertex(width/2 -10, height/2 + 85); //L SHOULDER
+    vertex(width/2 +10, height/2 + 85); //R SHOULDER
+    vertex(width/2 +15, height/2 + 145) // R ARM
+    vertex(width/2 +7, height/2 + 100); // R ARMPIT
+    vertex(width/2 +6, height/2 + 120) //R WAIST
+    vertex(width/2 +7, height/2 + 130); // R HIP
+  vertex(width/2 +5, height/2 + 180); // R FOOT
+    vertex(width/2, height/2 + 130); // PELVIS
+  vertex(width/2 -5, height/2 + 180); //L FOOT
+    vertex(width/2 -7, height/2 + 130); // L HIP
+    vertex(width/2 -6, height/2 + 120) //L WAIST
+    vertex(width/2 -7, height/2 + 100); // L ARMPIT
+    vertex(width/2 -15, height/2 + 145) // L ARM
+  endShape(CLOSE);
+}
+function goliath(goliath_y){
+  fill(50,3,3);
+  //noStroke();
+  ellipse(width/2, goliath_y-70, 120,100)
+  ellipse(width/2,goliath_y +200, 300,500);
+}
+function mini_slingshot(){
+  fill(120, 72, 16);
+  quad(width/2 -17, height/2 + 135,
+       width/2 -13, height/2 + 135,
+       width/2 -13, height/2 + 145,
+       width/2 -17, height/2 + 145);
+  quad(width/2 -20, height/2 + 145,
+       width/2 -10, height/2 + 145,
+       width/2 -10, height/2 + 150,
+       width/2 -20, height/2 + 150);
+  quad(width/2 -20, height/2 + 150,
+       width/2 -17, height/2 + 150,
+       width/2 -17, height/2 + 157,
+       width/2 -20, height/2 + 157);
+  quad(width/2 -13, height/2 + 150,
+       width/2 -10, height/2 + 150,
+       width/2 -10, height/2 + 157,
+       width/2 -13, height/2 + 157); 
+}
